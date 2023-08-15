@@ -1,6 +1,6 @@
 {
   "name": "@yennis/klinecharts-pro",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Financial chart built out of the box based on KLineChart.",
   "type": "module",
   "main": "./dist/klinecharts-pro.umd.js",
@@ -34,7 +34,16 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "docs:deploy": "npm run docs:build && gh-pages -d website"
+    "docs:deploy": "npm run docs:build && gh-pages -d website",
+    "release": "standard-version",
+    "postrelease": "git push && git push --tags --no-verify",
+    "version-tag:major": "npm run release -- --release-as major",
+    "version-tag:minor": "npm run release -- --release-as minor",
+    "version-tag:patch": "npm run release -- --release-as patch",
+    "version-tag:premajor": "npm run version-tag:major -- --prerelease",
+    "version-tag:preminor": "npm run version-tag:minor -- --prerelease",
+    "version-tag:prepatch": "npm run version-tag:patch -- --prerelease",
+    "version-tag:prerelease": "npm run release -- --prerelease"
   },
   "devDependencies": {
     "@solidjs/testing-library": "^0.6.0",
@@ -52,6 +61,7 @@
     "gh-pages": "^5.0.0",
     "less": "^4.1.3",
     "less-loader": "^11.1.0",
+    "standard-version": "^9.5.0",
     "typescript": "^4.9.5",
     "vite": "^4.1.1",
     "vite-plugin-solid": "^2.6.1",
