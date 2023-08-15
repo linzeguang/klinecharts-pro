@@ -31,7 +31,7 @@
     "build-core": "tsc && vite build",
     "build-dts": "dts-bundle-generator --no-banner true --umd-module-name klinechartspro -o dist/index.d.ts src/index.ts",
     "build": "npm run build-core && npm run build-dts",
-    "docs:dev": "vitepress dev docs",
+    "docs:dev": "vitepress dev docs --host",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "docs:deploy": "npm run docs:build && gh-pages -d website",
