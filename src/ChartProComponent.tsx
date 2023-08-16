@@ -36,6 +36,9 @@ import {
   Indicator,
   DomPosition,
   FormatDateType,
+  IndicatorCreate,
+  IndicatorFigureStylesCallbackData,
+  IndicatorStyle,
 } from "klinecharts";
 
 import lodashSet from "lodash/set";
@@ -56,7 +59,14 @@ import {
 
 import { translateTimezone } from "./widget/timezone-modal/data";
 
-import { SymbolInfo, Period, ChartProOptions, ChartPro } from "./types";
+import {
+  SymbolInfo,
+  Period,
+  ChartProOptions,
+  ChartPro,
+  IndicatorSettingModalParams,
+} from "./types";
+import { getIndicatorBarStyle, getIndicatorLineStyle } from "./utils";
 
 export interface ChartProComponentProps
   extends Required<Omit<ChartProOptions, "container">> {
@@ -74,32 +84,31 @@ function createIndicator(
   isStack?: boolean,
   paneOptions?: PaneOptions
 ): Nullable<string> {
+  const option: IndicatorCreate = {
+    name: indicatorName,
+    // @ts-expect-error
+    createTooltipDataSource: ({ indicator, defaultStyles }) => {
+      const icons = [];
+      if (indicator.visible) {
+        icons.push(defaultStyles.tooltip.icons[1]);
+        icons.push(defaultStyles.tooltip.icons[2]);
+        icons.push(defaultStyles.tooltip.icons[3]);
+      } else {
+        icons.push(defaultStyles.tooltip.icons[0]);
+        icons.push(defaultStyles.tooltip.icons[2]);
+        icons.push(defaultStyles.tooltip.icons[3]);
+      }
+      return { icons };
+    },
+  };
   if (indicatorName === "VOL") {
     paneOptions = { gap: { bottom: 2 }, ...paneOptions };
+    option.calcParams = [5, 10];
   }
-  return (
-    widget?.createIndicator(
-      {
-        name: indicatorName,
-        // @ts-expect-error
-        createTooltipDataSource: ({ indicator, defaultStyles }) => {
-          const icons = [];
-          if (indicator.visible) {
-            icons.push(defaultStyles.tooltip.icons[1]);
-            icons.push(defaultStyles.tooltip.icons[2]);
-            icons.push(defaultStyles.tooltip.icons[3]);
-          } else {
-            icons.push(defaultStyles.tooltip.icons[0]);
-            icons.push(defaultStyles.tooltip.icons[2]);
-            icons.push(defaultStyles.tooltip.icons[3]);
-          }
-          return { icons };
-        },
-      },
-      isStack,
-      paneOptions
-    ) ?? null
-  );
+  if (indicatorName === "MA") {
+    option.calcParams = [5, 10, 20];
+  }
+  return widget?.createIndicator(option, isStack, paneOptions) ?? null;
 }
 
 const ChartProComponent: Component<ChartProComponentProps> = (props) => {
@@ -133,6 +142,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
 
   const [screenshotUrl, setScreenshotUrl] = createSignal("");
 
+  const [periodBarVisible, setPeriodBarVisible] = createSignal(props.header);
   const [drawingBarVisible, setDrawingBarVisible] = createSignal(
     props.drawingBarVisible
   );
@@ -143,7 +153,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
   const [loadingVisible, setLoadingVisible] = createSignal(false);
 
   const [indicatorSettingModalParams, setIndicatorSettingModalParams] =
-    createSignal({
+    createSignal<IndicatorSettingModalParams>({
       visible: false,
       indicatorName: "",
       paneId: "",
@@ -168,6 +178,15 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     getSymbol: () => symbol(),
     setPeriod,
     getPeriod: () => period(),
+    setSymbolSearchModalVisible: setSymbolSearchModalVisible,
+    setIndicatorModalVisible: setIndicatorModalVisible,
+    setTimezoneModalVisible: setTimezoneModalVisible,
+    setSettingModalVisible: setSettingModalVisible,
+    setScreenshotUrl: setScreenshotUrl,
+    setIndicatorSettingModalParams: setIndicatorSettingModalParams,
+    setPeriodBarVisible: setPeriodBarVisible,
+    setDrawingBarVisible: setDrawingBarVisible,
+    setLoadingVisible: setLoadingVisible,
   });
 
   const documentResize = () => {
@@ -291,11 +310,17 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           );
         },
       },
+      styles: {
+        indicator: {
+          bars: getIndicatorBarStyle(),
+          lines: getIndicatorLineStyle(),
+        },
+      },
     });
 
     if (widget) {
       const watermarkContainer = widget.getDom("candle_pane", DomPosition.Main);
-      if (watermarkContainer) {
+      if (watermarkContainer && props.watermark) {
         let watermark = document.createElement("div");
         watermark.className = "klinecharts-pro-watermark";
         if (utils.isString(props.watermark)) {
@@ -319,6 +344,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     mainIndicators().forEach((indicator) => {
       createIndicator(widget, indicator, true, { id: "candle_pane" });
     });
+
     const subIndicatorMap = {};
     props.subIndicators!.forEach((indicator) => {
       const paneId = createIndicator(widget, indicator, true);
@@ -668,51 +694,46 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           }}
         />
       </Show>
-      {utils.isBoolean(props.header) ? (
-        props.header ? (
-          <PeriodBar
-            locale={props.locale}
-            symbol={symbol()}
-            spread={drawingBarVisible()}
-            period={period()}
-            periods={props.periods}
-            onMenuClick={async () => {
-              try {
-                await startTransition(() =>
-                  setDrawingBarVisible(!drawingBarVisible())
-                );
-                widget?.resize();
-              } catch (e) {}
-            }}
-            onSymbolClick={() => {
-              setSymbolSearchModalVisible(!symbolSearchModalVisible());
-            }}
-            onPeriodChange={setPeriod}
-            onIndicatorClick={() => {
-              setIndicatorModalVisible((visible) => !visible);
-            }}
-            onTimezoneClick={() => {
-              setTimezoneModalVisible((visible) => !visible);
-            }}
-            onSettingClick={() => {
-              setSettingModalVisible((visible) => !visible);
-            }}
-            onScreenshotClick={() => {
-              if (widget) {
-                const url = widget.getConvertPictureUrl(
-                  true,
-                  "jpeg",
-                  props.theme === "dark" ? "#151517" : "#ffffff"
-                );
-                setScreenshotUrl(url);
-              }
-            }}
-          />
-        ) : null
-      ) : (
-        props.header
-      )}
-
+      <Show when={periodBarVisible()}>
+        <PeriodBar
+          locale={props.locale}
+          symbol={symbol()}
+          spread={drawingBarVisible()}
+          period={period()}
+          periods={props.periods}
+          onMenuClick={async () => {
+            try {
+              await startTransition(() =>
+                setDrawingBarVisible(!drawingBarVisible())
+              );
+              widget?.resize();
+            } catch (e) {}
+          }}
+          onSymbolClick={() => {
+            setSymbolSearchModalVisible(!symbolSearchModalVisible());
+          }}
+          onPeriodChange={setPeriod}
+          onIndicatorClick={() => {
+            setIndicatorModalVisible((visible) => !visible);
+          }}
+          onTimezoneClick={() => {
+            setTimezoneModalVisible((visible) => !visible);
+          }}
+          onSettingClick={() => {
+            setSettingModalVisible((visible) => !visible);
+          }}
+          onScreenshotClick={() => {
+            if (widget) {
+              const url = widget.getConvertPictureUrl(
+                true,
+                "jpeg",
+                props.theme === "dark" ? "#151517" : "#ffffff"
+              );
+              setScreenshotUrl(url);
+            }
+          }}
+        />
+      </Show>
       <div class="klinecharts-pro-content">
         <Show when={loadingVisible()}>
           <Loading />

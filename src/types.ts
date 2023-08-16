@@ -13,6 +13,7 @@
  */
 
 import { KLineData, Styles, DeepPartial } from "klinecharts";
+import { Setter } from "solid-js";
 
 export interface SymbolInfo {
   ticker: string;
@@ -51,11 +52,18 @@ export interface Datafeed {
   unsubscribe(symbol: SymbolInfo, period: Period): void;
 }
 
+export interface IndicatorSettingModalParams {
+  visible: boolean;
+  indicatorName: string;
+  paneId: string;
+  calcParams: any[];
+}
+
 export interface ChartProOptions {
   container: string | HTMLElement;
   styles?: DeepPartial<Styles>;
-  header?: string | Node;
-  watermark?: string | Node;
+  header?: boolean;
+  watermark?: false | string | Node;
   theme?: string;
   locale?: string;
   drawingBarVisible?: boolean;
@@ -81,4 +89,13 @@ export interface ChartPro {
   getSymbol(): SymbolInfo;
   setPeriod(period: Period): void;
   getPeriod(): Period;
+  setSymbolSearchModalVisible(visible: boolean): void;
+  setIndicatorModalVisible(visible: boolean): void;
+  setTimezoneModalVisible(visible: boolean): void;
+  setSettingModalVisible(visible: boolean): void;
+  setScreenshotUrl(screenshotUrl: string): void;
+  setIndicatorSettingModalParams(params: IndicatorSettingModalParams): void;
+  setPeriodBarVisible(visible: boolean): void;
+  setDrawingBarVisible(visible: boolean): void;
+  setLoadingVisible(visible: boolean): void;
 }
