@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { KLineData, Styles, DeepPartial } from "klinecharts";
+import { KLineData, Styles, DeepPartial, Chart } from "klinecharts";
 import { Setter } from "solid-js";
 
 export interface SymbolInfo {
@@ -77,6 +77,7 @@ export interface ChartProOptions {
 }
 
 export interface ChartPro {
+  getWidget(): Chart;
   setTheme(theme: string): void;
   getTheme(): string;
   setStyles(styles: DeepPartial<Styles>): void;

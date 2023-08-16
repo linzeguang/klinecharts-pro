@@ -20,6 +20,7 @@ import {
   DeepPartial,
   Styles,
   registerLocale,
+  Chart,
 } from "klinecharts";
 
 import ChartProComponent from "./ChartProComponent";
@@ -103,6 +104,10 @@ export default class KLineChartPro implements ChartPro {
   private _container: Nullable<HTMLElement>;
 
   private _chartApi: Nullable<ChartPro> = null;
+
+  getWidget(): Chart {
+    return this._chartApi!.getWidget();
+  }
 
   setTheme(theme: string): void {
     this._container?.setAttribute("data-theme", theme);

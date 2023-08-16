@@ -161,6 +161,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     });
 
   props.ref({
+    getWidget: () => widget!,
     setTheme,
     getTheme: () => theme(),
     setStyles,
@@ -734,7 +735,10 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
           }}
         />
       </Show>
-      <div class="klinecharts-pro-content">
+      <div
+        class="klinecharts-pro-content"
+        data-period-bar-visible={periodBarVisible()}
+      >
         <Show when={loadingVisible()}>
           <Loading />
         </Show>
