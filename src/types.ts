@@ -99,4 +99,5 @@ export interface ChartPro {
   setPeriodBarVisible(visible: boolean): void;
   setDrawingBarVisible(visible: boolean): void;
   setLoadingVisible(visible: boolean): void;
+  remove: () => void;
 }

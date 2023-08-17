@@ -191,4 +191,7 @@ export default class KLineChartPro implements ChartPro {
   setLoadingVisible(visible: boolean) {
     this._chartApi!.setLoadingVisible(visible);
   }
+  remove() {
+    this._chartApi!.remove();
+  }
 }

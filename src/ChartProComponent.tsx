@@ -188,6 +188,7 @@ const ChartProComponent: Component<ChartProComponentProps> = (props) => {
     setPeriodBarVisible: setPeriodBarVisible,
     setDrawingBarVisible: setDrawingBarVisible,
     setLoadingVisible: setLoadingVisible,
+    remove: () => props.datafeed.unsubscribe(symbol(), period()),
   });
 
   const documentResize = () => {
