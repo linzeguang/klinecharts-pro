@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.6](https://github.com/linzeguang/klinecharts-pro/compare/v0.0.5...v0.0.6) (2023-08-17)
+
+
+### Features
+
+* 新增remove方便卸载图表时取消订阅 ([4eebc35](https://github.com/linzeguang/klinecharts-pro/commit/4eebc35c8a45ca37dcdc2efa2883e8f0bb6dc612))
+
 ### [0.0.5](https://github.com/linzeguang/klinecharts-pro/compare/v0.0.4...v0.0.5) (2023-08-16)
 
 ### [0.0.4](https://github.com/linzeguang/klinecharts-pro/compare/v0.0.3...v0.0.4) (2023-08-16)
