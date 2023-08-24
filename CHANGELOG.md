@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.7](https://github.com/linzeguang/klinecharts-pro/compare/v0.0.6...v0.0.7) (2023-08-24)
+
+
+### Features
+
+* 修改loading样式 ([eadf37f](https://github.com/linzeguang/klinecharts-pro/commit/eadf37f56f063b0f159eda18a09e7d4185781ad4))
+
 ### [0.0.6](https://github.com/linzeguang/klinecharts-pro/compare/v0.0.5...v0.0.6) (2023-08-17)
 
 
